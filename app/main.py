@@ -1,21 +1,28 @@
 
-
-from fastapi import Depends, FastAPI
-from pydantic import BaseModel, ConfigDict
+from contextlib import asynccontextmanager
+from fastapi import Depends, FastAPI, HTTPException
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 from app import models
 from app.database import SessionLocal, engine
 
-app = FastAPI()
 
-models.Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    models.Base.metadata.create_all(bind=engine)
+    yield
+
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 
 class ExpenseCreate(BaseModel):
-    amount: float
-    category: str
-    description: str
+    amount: float = Field(gt=0)
+    category: str = Field(min_length=1)
+    description: str = Field(min_length=1)
 
 
 class ExpenseResponse(BaseModel):
@@ -34,6 +41,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 
 @app.get("/")
@@ -62,3 +70,20 @@ def create_expense(
 def get_expenses(db: Session = Depends(get_db)):
     expenses = db.query(models.Expense).all()
     return expenses
+
+@app.delete("/expense/{expense_id}")
+def delete_expense(
+    expense_id: int,
+    db: Session = Depends(get_db),
+):
+    expense = db.query(models.Expense).filter(
+        models.Expense.id == expense_id
+    ).first()
+
+    if expense is None:
+        raise HTTPException(status_code=404, detail="Expense not found")
+
+    db.delete(expense)
+    db.commit()
+
+    return {"message": "Expense deleted"}
