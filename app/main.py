@@ -82,6 +82,27 @@ def create_expense(
     db.refresh(new_expense)
 
     return new_expense
+@app.put("/expense/{expense_id}", response_model=ExpenseResponse)
+def update_expense(
+    expense_id: int,
+    expense: ExpenseCreate,
+    db: Session = Depends(get_db),
+):
+    existing_expense = db.query(models.Expense).filter(
+        models.Expense.id == expense_id
+    ).first()
+
+    if existing_expense is None:
+        raise HTTPException(status_code=404, detail="Expense not found")
+
+    existing_expense.amount = expense.amount
+    existing_expense.category = expense.category
+    existing_expense.description = expense.description
+
+    db.commit()
+    db.refresh(existing_expense)
+
+    return existing_expense
 
 @app.get("/expenses", response_model=list[ExpenseResponse])
 def get_expenses(

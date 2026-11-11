@@ -353,3 +353,47 @@ def test_get_expenses_with_offset():
 
     assert len(data) == 1
     assert data[0]["amount"] == 200
+
+def test_update_expense():
+    create_response = client.post(
+        "/expense",
+        json={
+            "amount": 100,
+            "category": "food",
+            "description": "Lunch",
+        },
+    )
+
+    expense_id = create_response.json()["id"]
+
+    response = client.put(
+        f"/expense/{expense_id}",
+        json={
+            "amount": 250,
+            "category": "transport",
+            "description": "Taxi",
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["id"] == expense_id
+    assert data["amount"] == 250
+    assert data["category"] == "transport"
+    assert data["description"] == "Taxi"
+
+
+def test_update_nonexistent_expense():
+    response = client.put(
+        "/expense/999999",
+        json={
+            "amount": 250,
+            "category": "transport",
+            "description": "Taxi",
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Expense not found"
