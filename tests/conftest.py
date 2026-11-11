@@ -1,9 +1,10 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, delete
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-
+import pytest
 
 from app.database import Base
+from app import models
 from app.main import app, get_db
 
 
@@ -25,8 +26,16 @@ TestingSessionLocal = sessionmaker(
 Base.metadata.create_all(bind=engine)
 
 
+@pytest.fixture(autouse=True)
+def clean_database():
+    with TestingSessionLocal() as db:
+        db.execute(delete(models.Expense))
+        db.commit()
+
+
 def override_get_db():
     db = TestingSessionLocal()
+
     try:
         yield db
     finally:

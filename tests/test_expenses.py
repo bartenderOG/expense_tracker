@@ -25,8 +25,16 @@ def test_create_expense():
 
 
 def test_get_expenses():
-    response = client.get("/expenses")
+    client.post(
+        "/expense",
+        json={
+            "amount": 300,
+            "category": "food",
+            "description": "Dinner",
+        },
+    )
 
+    response = client.get("/expenses")
     assert response.status_code == 200
 
     data = response.json()
@@ -141,3 +149,33 @@ def test_create_expense_with_whitespace_description():
     )
 
     assert response.status_code == 422
+
+def test_get_expenses_by_category():
+    client.post(
+        "/expense",
+        json={
+            "amount": 100,
+            "category": "food",
+            "description": "Lunch",
+        },
+    )
+
+    client.post(
+        "/expense",
+        json={
+            "amount": 200,
+            "category": "transport",
+            "description": "Taxi",
+        },
+    )
+
+    response = client.get("/expenses?category=food")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["category"] == "food"
+    assert data[0]["amount"] == 100
+

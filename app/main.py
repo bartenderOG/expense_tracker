@@ -1,6 +1,6 @@
 
 from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from sqlalchemy.orm import Session
@@ -84,9 +84,16 @@ def create_expense(
     return new_expense
 
 @app.get("/expenses", response_model=list[ExpenseResponse])
-def get_expenses(db: Session = Depends(get_db)):
-    expenses = db.query(models.Expense).all()
-    return expenses
+def get_expenses(
+    category: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(models.Expense)
+
+    if category:
+        query = query.filter(models.Expense.category == category)
+
+    return query.all()
 
 @app.delete("/expense/{expense_id}")
 def delete_expense(
