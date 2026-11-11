@@ -86,12 +86,18 @@ def create_expense(
 @app.get("/expenses", response_model=list[ExpenseResponse])
 def get_expenses(
     category: str | None = Query(default=None),
+    min_amount: float | None = Query(default=None, gt=0),
+    max_amount: float | None = Query(default=None, gt=0),
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Expense)
 
     if category:
         query = query.filter(models.Expense.category == category)
+    if min_amount is not None:
+        query = query.filter(models.Expense.amount >= min_amount)
+    if max_amount is not None:
+        query = query.filter(models.Expense.amount <= max_amount)
 
     return query.all()
 

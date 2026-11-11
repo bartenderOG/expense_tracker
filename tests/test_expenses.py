@@ -179,3 +179,88 @@ def test_get_expenses_by_category():
     assert data[0]["category"] == "food"
     assert data[0]["amount"] == 100
 
+def test_get_expenses_by_min_amount():
+    client.post(
+        "/expense",
+        json={
+            "amount": 100,
+            "category": "food",
+            "description": "Lunch",
+        },
+    )
+    client.post(
+        "/expense",
+        json={
+            "amount": 500,
+            "category": "transport",
+            "description": "Taxi",
+        },
+    )
+
+    response = client.get("/expenses?min_amount=300")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["amount"] == 500
+
+def test_get_expenses_by_max_amount():
+    client.post(
+        "/expense",
+        json={
+            "amount": 100,
+            "category": "food",
+            "description": "Lunch",
+        },
+    )
+    client.post(
+        "/expense",
+        json={
+            "amount": 500,
+            "category": "transport",
+            "description": "Taxi",
+        },
+    )
+
+    response = client.get("/expenses?max_amount=300")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["amount"] == 100
+
+def test_get_expenses_by_amount_range():
+    client.post(
+        "/expense",
+        json={
+            "amount": 50,
+            "category": "food",
+            "description": "Breakfast",
+        },
+    )
+    client.post(
+        "/expense",
+        json={
+            "amount": 250,
+            "category": "food",
+            "description": "Lunch",
+        },
+    )
+    client.post(
+        "/expense",
+        json={
+            "amount": 700,
+            "category": "shopping",
+            "description": "Clothes",
+        },
+    )
+
+    response = client.get("/expenses?min_amount=100&max_amount=500")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["amount"] == 250
