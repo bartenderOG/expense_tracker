@@ -1,7 +1,8 @@
 
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from sqlalchemy.orm import Session
 
 from app import models
@@ -23,6 +24,22 @@ class ExpenseCreate(BaseModel):
     amount: float = Field(gt=0)
     category: str = Field(min_length=1)
     description: str = Field(min_length=1)
+
+    @field_validator("category")
+    @classmethod
+    def validate_category(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Category cannot be empty")
+
+        return value.strip()
+
+    @field_validator("description")
+    @classmethod
+    def validate_description(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Description cannot be empty")
+
+        return value.strip()
 
 
 class ExpenseResponse(BaseModel):

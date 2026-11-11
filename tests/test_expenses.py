@@ -115,3 +115,29 @@ def test_create_expense_with_empty_description():
     )
 
     assert response.status_code == 422
+
+def test_create_expense_with_whitespace_category():
+
+    response = client.post(
+        "/expense",
+        json={
+            "amount": 500,
+            "category": "   ",
+            "description": "Test expense",
+        },
+    )
+
+    assert response.status_code == 422
+
+def test_create_expense_with_whitespace_description():
+
+    response = client.post(
+        "/expense",
+        json={
+            "amount": 500,
+            "category": "food",
+            "description": "   ",
+        },
+    )
+
+    assert response.status_code == 422
