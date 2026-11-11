@@ -1,4 +1,3 @@
-
 name: Tests
 
 on:
@@ -12,10 +11,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     env:
       DATABASE_URL: sqlite:///./ci.db
-	
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
