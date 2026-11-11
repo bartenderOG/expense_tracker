@@ -1,7 +1,7 @@
 
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Query
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 
@@ -40,6 +40,7 @@ class ExpenseCreate(BaseModel):
             raise ValueError("Description cannot be empty")
 
         return value.strip()
+
 
 
 class ExpenseResponse(BaseModel):
@@ -114,6 +115,12 @@ def get_expenses(
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
+    if min_amount is not None and max_amount is not None:
+        if min_amount > max_amount:
+            raise HTTPException(
+                status_code=400,
+                detail="min_amount cannot be greater than max_amount",
+            )
     query = db.query(models.Expense)
 
     if category:

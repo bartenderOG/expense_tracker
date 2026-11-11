@@ -1,32 +1,36 @@
+cat > README.md <<'EOF'
 # Expense Tracker API
 
-A REST API for managing personal expenses, built with FastAPI, SQLAlchemy and PostgreSQL.
+REST API for managing personal expenses, built with FastAPI, SQLAlchemy and PostgreSQL.
 
 ## Features
 
 - Create expenses
-- Get all expenses
+- Get expenses
 - Update expenses
 - Delete expenses
-- Filter expenses by category
-- Filter expenses by minimum amount
-- Filter expenses by maximum amount
-- Sort expenses by amount
+- Filter by category
+- Filter by minimum and maximum amount
+- Validate amount ranges
+- Sort by amount
 - Pagination with limit and offset
 - Input validation with Pydantic
 - Automated tests with pytest
 - Isolated SQLite database for tests
-- PostgreSQL database with Docker
+- PostgreSQL with Docker
+- Environment variables with `.env`
+- GitHub Actions CI
 
 ## Tech Stack
 
 - Python 3.14
 - FastAPI
 - SQLAlchemy
-- PostgreSQL
+- PostgreSQL 16
 - Docker
-- Pytest
 - Pydantic
+- Pytest
+- GitHub Actions
 - Git
 
 ## Project Structure
@@ -34,12 +38,18 @@ A REST API for managing personal expenses, built with FastAPI, SQLAlchemy and Po
 ```text
 expense_tracker/
 ├── app/
-│   ├── main.py
+│   ├── __init__.py
 │   ├── database.py
+│   ├── main.py
 │   └── models.py
 ├── tests/
 │   ├── conftest.py
 │   └── test_expenses.py
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+├── .env
 ├── .gitignore
-├── README.md
-└── docker-compose.yml
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
