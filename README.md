@@ -1,7 +1,9 @@
-cat > README.md <<'EOF'
-# Expense Tracker API
+python - <<'PY'
+from pathlib import Path
 
-REST API for managing personal expenses, built with FastAPI, SQLAlchemy and PostgreSQL.
+Path("README.md").write_text("""# Expense Tracker API
+
+REST API for managing personal expenses, built with FastAPI, SQLAlchemy, and PostgreSQL.
 
 ## Features
 
@@ -9,9 +11,8 @@ REST API for managing personal expenses, built with FastAPI, SQLAlchemy and Post
 - Get expenses
 - Update expenses
 - Delete expenses
-- Filter by category
+- Filter expenses by category
 - Filter by minimum and maximum amount
-- Validate amount ranges
 - Sort by amount
 - Pagination with limit and offset
 - Input validation with Pydantic
@@ -48,8 +49,8 @@ expense_tracker/
 ├── .github/
 │   └── workflows/
 │       └── tests.yml
-├── .env
 ├── .gitignore
+├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
