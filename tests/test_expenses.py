@@ -315,3 +315,41 @@ def test_get_expenses_sorted_descending():
     data = response.json()
 
     assert [item["amount"] for item in data] == [500, 100]
+
+def test_get_expenses_with_limit():
+    for amount in [100, 200, 300]:
+        client.post(
+            "/expense",
+            json={
+                "amount": amount,
+                "category": "food",
+                "description": f"Expense {amount}",
+            },
+        )
+
+    response = client.get("/expenses?limit=2")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data) == 2
+
+
+def test_get_expenses_with_offset():
+    for amount in [100, 200, 300]:
+        client.post(
+            "/expense",
+            json={
+                "amount": amount,
+                "category": "food",
+                "description": f"Expense {amount}",
+            },
+        )
+
+    response = client.get("/expenses?sort=asc&offset=1&limit=1")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data) == 1
+    assert data[0]["amount"] == 200

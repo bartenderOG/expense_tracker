@@ -89,6 +89,8 @@ def get_expenses(
     min_amount: float | None = Query(default=None, gt=0),
     max_amount: float | None = Query(default=None, gt=0),
     sort: str | None = Query(default=None),
+    limit: int = Query(default=10, gt=0, le=100),
+    offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Expense)
@@ -103,6 +105,8 @@ def get_expenses(
         query = query.order_by(asc(models.Expense.amount))
     elif sort == "desc":
         query = query.order_by(desc(models.Expense.amount))
+
+    query = query.offset(offset).limit(limit)
 
     return query.all()
 
