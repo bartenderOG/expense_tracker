@@ -264,3 +264,54 @@ def test_get_expenses_by_amount_range():
 
     assert len(data) == 1
     assert data[0]["amount"] == 250
+
+def test_get_expenses_sorted_ascending():
+    client.post(
+        "/expense",
+        json={
+            "amount": 500,
+            "category": "food",
+            "description": "Lunch",
+        },
+    )
+    client.post(
+        "/expense",
+        json={
+            "amount": 100,
+            "category": "transport",
+            "description": "Bus",
+        },
+    )
+
+    response = client.get("/expenses?sort=asc")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert [item["amount"] for item in data] == [100, 500]
+
+
+def test_get_expenses_sorted_descending():
+    client.post(
+        "/expense",
+        json={
+            "amount": 100,
+            "category": "food",
+            "description": "Lunch",
+        },
+    )
+    client.post(
+        "/expense",
+        json={
+            "amount": 500,
+            "category": "transport",
+            "description": "Taxi",
+        },
+    )
+
+    response = client.get("/expenses?sort=desc")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert [item["amount"] for item in data] == [500, 100]

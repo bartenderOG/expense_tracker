@@ -2,7 +2,7 @@
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-
+from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 
 from app import models
@@ -88,6 +88,7 @@ def get_expenses(
     category: str | None = Query(default=None),
     min_amount: float | None = Query(default=None, gt=0),
     max_amount: float | None = Query(default=None, gt=0),
+    sort: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Expense)
@@ -98,6 +99,10 @@ def get_expenses(
         query = query.filter(models.Expense.amount >= min_amount)
     if max_amount is not None:
         query = query.filter(models.Expense.amount <= max_amount)
+    if sort == "asc":
+        query = query.order_by(asc(models.Expense.amount))
+    elif sort == "desc":
+        query = query.order_by(desc(models.Expense.amount))
 
     return query.all()
 
